@@ -57,9 +57,18 @@ module Oxidized
       update repo, file, outputs.to_cfg
     end
 
-    def fetch node, group
+    def fetch node, group, opt = {}
       begin
         repo, path = yield_repo_and_path(node, group)
+        if opt[:output_type] and opt[:output_name]
+          path = path + '--' + opt[:output_name]
+          if @cfg.type_as_directory?
+            path = opt[:output_type] + '/' + path
+          else
+            repo = File.join(File.dirname(repo), opt[:output_type] + '.git')
+          end
+        end
+
         repo = Rugged::Repository.new repo
         index = repo.index
         index.read_tree repo.head.target.tree unless repo.empty?

@@ -56,9 +56,9 @@ module Oxidized
       end
     end
 
-    def fetch node_name, group
+    def fetch node_name, group, opt = {}
       yield_node_output(node_name) do |node, output|
-        output.fetch node, group
+        output.fetch node, group, opt
       end
     end
 
@@ -171,6 +171,7 @@ module Oxidized
     def yield_node_output(node_name)
       with_lock do
         node = find { |n| n.name == node_name }
+	raise Oxidized::NodeNotFound unless node
         output = node.output.new
         raise Oxidized::NotSupported unless output.respond_to? :fetch
         yield node, output
